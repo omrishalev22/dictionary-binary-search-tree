@@ -1,0 +1,3 @@
+/home/shalevo/CLionProjects/untitled4/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/shalevo/CLionProjects/untitled4/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/shalevo/CLionProjects/untitled4/cmake-build-debug/CMakeFiles/untitled4.dir
