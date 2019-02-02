@@ -5,6 +5,7 @@
 #include <assert.h>
 
 #define SIZE 150
+#define SPACE " "
 
 typedef struct treeNode {
     char *word;
@@ -40,6 +41,10 @@ int findWordIdRec(TreeNode *root, char *word);
 void updateTree(WordTree *wt, char *word);
 
 TreeNode *updateTreeRec(TreeNode *node, char *word);
+
+int compareShorts(const void * a, const void * b);
+
+Document processToDoc(char * docStr, WordTree * wt);
 
 int main() {
     buildTree("./reuters_train.txt");
@@ -93,6 +98,7 @@ WordTree buildTree(char *fileName) {
     char line[SIZE];
 
     // Initialize the tree
+    // Todo: check if need to allocate memory to WordTree
     WordTree wordTree;
     wordTree.root = NULL;
 
@@ -178,4 +184,70 @@ TreeNode *updateTreeRec(TreeNode *node, char *word) {
     }
 
     return node;
+}
+
+int compareShorts(const void * a, const void * b) {
+    return ( *(short*)a - *(short*)b );
+}
+
+/**
+ * The method get a string of words (seperated by a space) and a word tree.
+ * The method will parse the string and return a Document object, includes the
+ * amount of DIFFERENT words, and a list of the word IDs of the different words, sorted.
+ * @param docStr
+ * @param wt
+ * @return
+ */
+Document processToDoc(char * docStr, WordTree * wt) {
+    char *word;
+    int i, isWordIdExists, currentWordId;
+    unsigned int logicalSize = 0, physicalSize = 1;
+    unsigned short * wordIds = (unsigned short *)malloc(physicalSize * sizeof(unsigned short));
+    Document result;
+
+    word = strtok(docStr, SPACE);
+
+    while (word != NULL) {
+        isWordIdExists = 0;
+
+        // Get word ID for current word
+        currentWordId = findWordId(wt, word);
+
+        if (currentWordId != -1) {
+            // Check if the word ID already exists in the list
+            for (i = 0; i < logicalSize; i++) {
+                if (wordIds[i] == currentWordId) {
+                    isWordIdExists = 1;
+                    break;
+                }
+            }
+
+            // If not, add the word ID to the list
+            if (!isWordIdExists) {
+                wordIds[logicalSize] = (unsigned short)currentWordId;
+                logicalSize++;
+            }
+        }
+
+        // Extend wordIds memory space if needed
+        if (logicalSize == physicalSize) {
+            physicalSize *= 2;
+            wordIds = realloc(wordIds, physicalSize * sizeof(unsigned short));
+        }
+
+        // Get next word
+        word = strtok(NULL, SPACE);
+    }
+
+    wordIds = realloc(wordIds, logicalSize * sizeof(unsigned short));
+    qsort(wordIds, logicalSize, sizeof(unsigned short), compareShorts);
+
+    // Todo: check if we need to allocate memory to Doc
+    result.docLength = logicalSize;
+    result.wordIdArr = wordIds;
+    return result;
+}
+
+void printDoc(Document * doc) {
+
 }
