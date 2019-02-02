@@ -339,20 +339,22 @@ void printDoc(Document * doc) {
     }
     printf("\n");
 }
-/*
+
 void documentFileToDocArr(char * filename, WordTree * wt,
                           Document ** documentsArr, char *** rawDocumentsArr, int * numDocs) {
     FILE *file = fopen(filename, "r");
     unsigned int logicalSize = 0, physicalSize = 1;
 
-    documentsArr = malloc(physicalSize * sizeof(Document *));
-    rawDocumentsArr = malloc(physicalSize * sizeof(char **));
+    documentsArr = (Document **)malloc(physicalSize * sizeof(Document *));
+    assert(documentsArr);
+    rawDocumentsArr = (char ***)malloc(physicalSize * sizeof(char **));
+    assert(rawDocumentsArr);
 
     char line[SIZE];
 
     while (fgets(line, SIZE, file)) {
         // Todo: help here
-        *documentsArr[logicalSize] = &processToDoc(line, wt);
+        documentsArr[logicalSize] = &processToDoc(line, wt);
         // Todo: here too
         rawDocumentsArr = &line;
 
@@ -370,4 +372,3 @@ void documentFileToDocArr(char * filename, WordTree * wt,
     rawDocumentsArr = realloc(rawDocumentsArr, logicalSize * sizeof(char **));
     fclose(file);
 }
-*/
