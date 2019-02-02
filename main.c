@@ -12,6 +12,11 @@ typedef struct tree {
     TreeNode *root;
 } WordTree;
 
+typedef struct document{
+    unsigned int docLength;
+    unsigned short * wordIdArr;
+} Document;
+
 WordTree buildTree(char * fileName);
 void updateTree(WordTree *wt, char * word);
 TreeNode * createNode (char  * word);
