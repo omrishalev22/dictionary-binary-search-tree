@@ -284,12 +284,16 @@ Document processToDoc(char * docStr, WordTree * wt) {
     char *word;
     int currentWordId;
     unsigned int logicalSize = 0, physicalSize = 1;
-    unsigned short * wordIds = (unsigned short *)malloc(physicalSize * sizeof(unsigned short));
+    unsigned short * wordIds;
     Document *result;
 
     // Initialize document in memory
     result = (Document *)malloc(sizeof(Document));
     assert(result);
+
+    // Initialize word Ids array
+    wordIds = (unsigned short *)malloc(physicalSize * sizeof(unsigned short));
+    assert(wordIds);
 
     word = strtok(docStr, " ");
 
