@@ -46,6 +46,8 @@ TreeNode *updateTreeRec(TreeNode *node, char *word);
 
 int compareShorts(const void * a, const void * b);
 
+int isNumberExistsInArr(unsigned short * arr, unsigned int size, unsigned short num);
+
 Document processToDoc(char * docStr, WordTree * wt);
 
 void printDoc(Document * doc);
@@ -245,6 +247,22 @@ int compareShorts(const void * a, const void * b) {
 }
 
 /**
+ * Checks if a short number exists in a short array.
+ * @param arr
+ * @param size
+ * @param num
+ * @return
+ */
+int isNumberExistsInArr(unsigned short * arr, unsigned int size, unsigned short num) {
+    for (int i = 0; i < size; i++) {
+        if (arr[i] == num) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+/**
  * The method get a string of words (seperated by a space) and a word tree.
  * The method will parse the string and return a Document object, includes the
  * amount of DIFFERENT words, and a list of the word IDs of the different words, sorted.
@@ -269,15 +287,8 @@ Document processToDoc(char * docStr, WordTree * wt) {
 
         if (currentWordId != -1) {
             // Check if the word ID already exists in the list
-            for (i = 0; i < logicalSize; i++) {
-                if (wordIds[i] == currentWordId) {
-                    isWordIdExists = 1;
-                    break;
-                }
-            }
-
             // If not, add the word ID to the list
-            if (!isWordIdExists) {
+            if (!isNumberExistsInArr(wordIds, logicalSize, (unsigned short)currentWordId)) {
                 wordIds[logicalSize] = (unsigned short)currentWordId;
                 logicalSize++;
             }
@@ -313,7 +324,6 @@ void printDoc(Document * doc) {
     }
     printf("\n");
 }
-/*
 
 void documentFileToDocArr(char * filename, WordTree * wt,
                           Document ** documentsArr, char *** rawDocumentsArr, int * numDocs) {
@@ -344,4 +354,4 @@ void documentFileToDocArr(char * filename, WordTree * wt,
     documentsArr = realloc(documentsArr, logicalSize * sizeof(Document *));
     rawDocumentsArr = realloc(rawDocumentsArr, logicalSize * sizeof(char **));
     fclose(file);
-}*/
+}
