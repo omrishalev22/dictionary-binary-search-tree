@@ -54,7 +54,6 @@ void FreeTree(WordTree tr);
 
 void FreeTreeRec(TreeNode *root);
 
-
 void documentFileToDocArr(char * filename, WordTree * wt,
                           Document ** documentsArr, char *** rawDocumentsArr, int * numDocs);
 
@@ -64,6 +63,12 @@ int main() {
     char ***rawDocumentsArr;
     int trainNumDocs;
     WordTree wordTree = buildTree(fileName);
+
+    char buff[80];
+    strcpy (buff, "This whale is a blue whale");
+    Document a=processToDoc(buff, &wordTree);
+    printDoc(&a);
+
     FreeTree(wordTree);
 //    documentFileToDocArr(fileName, &wordTree, trainDocsArr, rawDocumentsArr, &trainNumDocs);
 }
@@ -286,7 +291,7 @@ Document processToDoc(char * docStr, WordTree * wt) {
     result = (Document *)malloc(sizeof(Document));
     assert(result);
 
-    word = strtok(docStr, SPACE);
+    word = strtok(docStr, " ");
 
     while (word != NULL) {
         // Get word ID for current word
@@ -330,7 +335,7 @@ void printDoc(Document * doc) {
     }
     printf("\n");
 }
-
+/*
 void documentFileToDocArr(char * filename, WordTree * wt,
                           Document ** documentsArr, char *** rawDocumentsArr, int * numDocs) {
     FILE *file = fopen(filename, "r");
@@ -361,3 +366,4 @@ void documentFileToDocArr(char * filename, WordTree * wt,
     rawDocumentsArr = realloc(rawDocumentsArr, logicalSize * sizeof(char **));
     fclose(file);
 }
+*/
