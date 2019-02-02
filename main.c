@@ -5,7 +5,7 @@
 #include <ctype.h>
 
 #define SIZE 150
-#define SPACE ' '
+#define SPACE " "
 
 typedef struct treeNode {
     char *word;
@@ -60,7 +60,7 @@ int main() {
     int trainNumDocs;
     WordTree wordTree = buildTree(fileName);
 
-    documentFileToDocArr(fileName, &wordTree, trainDocsArr, rawDocumentsArr, &trainNumDocs);
+//    documentFileToDocArr(fileName, &wordTree, trainDocsArr, rawDocumentsArr, &trainNumDocs);
 }
 
 /**
@@ -74,7 +74,7 @@ int isWord(char *token) {
     for (i = 0; i < strlen(token); i++) {
 
         // check if char ASCII is outside the ABCabc boundaries
-        if (token[i] < 'A' && token[i] > 'z') {
+        if (token[i] < 'A' || token[i] > 'z') {
             return 0;
         }
         token[i] = (char)tolower(token[i]);
@@ -90,7 +90,7 @@ int isWord(char *token) {
  * @param wordTree
  */
 void processLine(char *line, WordTree *wordTree) {
-    char *token, *delimiters = SPACE;
+    char *token, *delimiters = " ,.;:?!-\t'()[]{}<>~_";
     token = strtok(line, delimiters);
 
     while (token != NULL) {
@@ -313,6 +313,7 @@ void printDoc(Document * doc) {
     }
     printf("\n");
 }
+/*
 
 void documentFileToDocArr(char * filename, WordTree * wt,
                           Document ** documentsArr, char *** rawDocumentsArr, int * numDocs) {
@@ -343,4 +344,4 @@ void documentFileToDocArr(char * filename, WordTree * wt,
     documentsArr = realloc(documentsArr, logicalSize * sizeof(Document *));
     rawDocumentsArr = realloc(rawDocumentsArr, logicalSize * sizeof(char **));
     fclose(file);
-}
+}*/
