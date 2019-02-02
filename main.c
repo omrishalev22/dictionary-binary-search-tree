@@ -39,26 +39,28 @@ int findWordId(WordTree *wt, char *word);
 
 int findWordIdRec(TreeNode *root, char *word);
 
-void toLowerCase(char * word);
+void toLowerCase(char *word);
 
 TreeNode *updateTreeRec(TreeNode *node, char *word);
 
-int compareShorts(const void * a, const void * b);
+int compareShorts(const void *a, const void *b);
 
-int isNumberExistsInArr(unsigned short * arr, unsigned int size, unsigned short num);
+int isNumberExistsInArr(unsigned short *arr, unsigned int size, unsigned short num);
 
-Document processToDoc(char * docStr, WordTree * wt);
+Document processToDoc(char *docStr, WordTree *wt);
 
-void printDoc(Document * doc);
+void printDoc(Document *doc);
 
 void FreeTree(WordTree tr);
 
 void FreeTreeRec(TreeNode *root);
 
-void documentFileToDocArr(char * filename, WordTree * wt,
-                          Document ** documentsArr, char *** rawDocumentsArr, int * numDocs);
+void documentFileToDocArr(char *filename, WordTree *wt,
+                          Document **documentsArr, char ***rawDocumentsArr, int *numDocs);
 
 int docSimTrain(Document * testDoc, Document ** trainDocumentsArr);
+
+float docSimBinary(Document *doc1, Document *doc2);
 
 int main() {
     char *fileName = "../reuters_train.txt", *docStr;
@@ -80,7 +82,10 @@ int main() {
         printf("best matching train document: %d %s", docIdx, *rawDocumentsArr[docIdx]);
     }
 
+    documentFileToDocArr(fileName, &wordTree, &trainDocsArr, &rawDocumentsArr, &trainNumDocs);
+    docSimBinary(trainDocsArr[0],trainDocsArr[1]);
     FreeTree(wordTree);
+//    documentFileToDocArr(fileName, &wordTree, trainDocsArr, rawDocumentsArr, &trainNumDocs);
 }
 
 /**
@@ -97,7 +102,7 @@ int isWord(char *token) {
         if (token[i] < 'A' || token[i] > 'z') {
             return 0;
         }
-        token[i] = (char)tolower(token[i]);
+        token[i] = (char) tolower(token[i]);
     }
 
     return 1;
@@ -198,7 +203,7 @@ TreeNode *createNode(char *word) {
     assert(newNode);
     newNode->word = (char *) calloc(strlen(word) + 1, sizeof(char));
     assert(newNode->word);
-    strcpy(newNode->word,word);
+    strcpy(newNode->word, word);
     newNode->wordId = wordId;
     newNode->left = newNode->right = NULL;
     wordId++;
@@ -212,7 +217,7 @@ TreeNode *createNode(char *word) {
  * @param word
  */
 void updateTree(WordTree *wt, char *word) {
-    if(wt-> root == NULL) {
+    if (wt->root == NULL) {
         wt->root = createNode(word);
         return;
     }
@@ -246,10 +251,8 @@ void FreeTree(WordTree tr) {
     FreeTreeRec(tr.root);
 }
 
-void FreeTreeRec(TreeNode *root)
-{
-    if (root != NULL)
-    {
+void FreeTreeRec(TreeNode *root) {
+    if (root != NULL) {
         FreeTreeRec(root->left);
         FreeTreeRec(root->right);
         free(root);
@@ -262,8 +265,8 @@ void FreeTreeRec(TreeNode *root)
  * @param b
  * @return
  */
-int compareShorts(const void * a, const void * b) {
-    return ( *(short*)a - *(short*)b );
+int compareShorts(const void *a, const void *b) {
+    return (*(short *) a - *(short *) b);
 }
 
 /**
@@ -273,7 +276,7 @@ int compareShorts(const void * a, const void * b) {
  * @param num
  * @return
  */
-int isNumberExistsInArr(unsigned short * arr, unsigned int size, unsigned short num) {
+int isNumberExistsInArr(unsigned short *arr, unsigned int size, unsigned short num) {
     for (int i = 0; i < size; i++) {
         if (arr[i] == num) {
             return 1;
@@ -282,6 +285,7 @@ int isNumberExistsInArr(unsigned short * arr, unsigned int size, unsigned short 
 
     return 0;
 }
+
 /**
  * The method get a string of words (seperated by a space) and a word tree.
  * The method will parse the string and return a Document object, includes the
@@ -290,19 +294,16 @@ int isNumberExistsInArr(unsigned short * arr, unsigned int size, unsigned short 
  * @param wt
  * @return
  */
-Document processToDoc(char * docStr, WordTree * wt) {
+Document processToDoc(char *docStr, WordTree *wt) {
+    // TODO lowerCase docSTr, need to make a lowercase function on string
     char *word;
     int currentWordId;
     unsigned int logicalSize = 0, physicalSize = 1;
-    unsigned short * wordIds;
-    Document *result;
-
-    // Initialize document in memory
-    result = (Document *)malloc(sizeof(Document));
-    assert(result);
+    unsigned short *wordIds;
+    Document result;
 
     // Initialize word Ids array
-    wordIds = (unsigned short *)malloc(physicalSize * sizeof(unsigned short));
+    wordIds = (unsigned short *) malloc(physicalSize * sizeof(unsigned short));
     assert(wordIds);
 
 
@@ -316,8 +317,8 @@ Document processToDoc(char * docStr, WordTree * wt) {
         if (currentWordId != -1) {
             // Check if the word ID already exists in the list
             // If not, add the word ID to the list
-            if (!isNumberExistsInArr(wordIds, logicalSize, (unsigned short)currentWordId)) {
-                wordIds[logicalSize] = (unsigned short)currentWordId;
+            if (!isNumberExistsInArr(wordIds, logicalSize, (unsigned short) currentWordId)) {
+                wordIds[logicalSize] = (unsigned short) currentWordId;
                 logicalSize++;
             }
         }
@@ -335,18 +336,18 @@ Document processToDoc(char * docStr, WordTree * wt) {
     wordIds = realloc(wordIds, logicalSize * sizeof(unsigned short));
     qsort(wordIds, logicalSize, sizeof(unsigned short), compareShorts);
 
-    result->docLength = logicalSize;
-    result->wordIdArr = wordIds;
-    return *result;
+    result.docLength = logicalSize;
+    result.wordIdArr = wordIds;
+    return result;
 }
 
 /**
  * Prints a Document to the stdout.
  * @param doc
  */
-void printDoc(Document * doc) {
+void printDoc(Document *doc) {
     printf("docLength:%d wordIds:", doc->docLength);
-    for (int i = 0; i < (int)doc->docLength; i++) {
+    for (int i = 0; i < (int) doc->docLength; i++) {
         printf("%d ", doc->wordIdArr[i]);
     }
     printf("\n");
@@ -363,22 +364,24 @@ void printDoc(Document * doc) {
  * @param rawDocumentsArr
  * @param numDocs
  */
-void documentFileToDocArr(char * filename, WordTree * wt,
-                          Document ** documentsArr, char *** rawDocumentsArr, int * numDocs) {
+void documentFileToDocArr(char *filename, WordTree *wt,
+                          Document **documentsArr, char ***rawDocumentsArr, int *numDocs) {
     FILE *file = fopen(filename, "r");
     unsigned int logicalSize = 0, physicalSize = 1;
 
-    documentsArr = (Document **)malloc(physicalSize * sizeof(Document *));
+    *documentsArr = (Document *) malloc(physicalSize * sizeof(Document ));
     assert(documentsArr);
-    rawDocumentsArr = (char ***)malloc(physicalSize * sizeof(char **));
+    *rawDocumentsArr = (char **) malloc(physicalSize * sizeof(char *));
     assert(rawDocumentsArr);
     char line[SIZE];
 
     while (fgets(line, SIZE, file)) {
-        char * newLine = (char *) malloc(strlen(line)+1);
+        char *newLine = (char *) malloc(strlen(line) + 1);
 
         Document doc = processToDoc(line, wt);
-        documentsArr[logicalSize] = &doc;
+        documentsArr[logicalSize] = (Document *) malloc(sizeof(Document));
+        memcpy(documentsArr[logicalSize],&doc, sizeof(Document));
+
         rawDocumentsArr[logicalSize] = &newLine;
 
         logicalSize++;
@@ -386,15 +389,14 @@ void documentFileToDocArr(char * filename, WordTree * wt,
         // Extend memory space if needed
         if (logicalSize == physicalSize) {
             physicalSize *= 2;
-            documentsArr = (Document **)realloc(documentsArr, physicalSize * sizeof(Document *));
-            rawDocumentsArr = (char ***)realloc(rawDocumentsArr, physicalSize * sizeof(char **));
+            *documentsArr = (Document **)realloc(*documentsArr, physicalSize * sizeof(Document *));
+            *rawDocumentsArr = (char ***)realloc(*rawDocumentsArr, physicalSize * sizeof(char **));
         }
     }
 
-    *documentsArr = (Document **)realloc(documentsArr, logicalSize * sizeof(Document *));
-    *rawDocumentsArr = (char ***)realloc(rawDocumentsArr, logicalSize * sizeof(char **));
+    *documentsArr = (Document **)realloc(*documentsArr, logicalSize * sizeof(Document *));
+    *rawDocumentsArr = (char ***)realloc(**rawDocumentsArr, logicalSize * sizeof(char **));
     *numDocs = logicalSize;
-
     fclose(file);
 }
 
@@ -422,4 +424,32 @@ int docSimTrain(Document * testDoc,
     }
 
     return matchIndex;
+}
+
+/**
+ * checks match ratio between two documents.
+ * @param doc1
+ * @param doc2
+ * @return
+ */
+float docSimBinary(Document *doc1, Document *doc2) {
+    float counter = 0;
+    int indexDoc1, indexDoc2;
+    int doc1Size = doc1->docLength, doc2Size = doc2->docLength;
+
+    while (doc1Size && doc2Size) {
+        if (doc1->wordIdArr[indexDoc1] == doc2->wordIdArr[indexDoc2]) {
+            counter++;
+            indexDoc1++;
+            indexDoc2++;
+            doc1Size--;
+            doc2Size--;
+        } else if (doc1->wordIdArr[indexDoc1] > doc2->wordIdArr[indexDoc2]) {
+            indexDoc1++;
+            doc1Size--;
+        } else {
+            indexDoc2++;
+            doc2Size--;
+        }
+    }
 }
