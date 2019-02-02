@@ -452,4 +452,6 @@ float docSimBinary(Document *doc1, Document *doc2) {
             doc2Size--;
         }
     }
+
+    return counter;
 }
