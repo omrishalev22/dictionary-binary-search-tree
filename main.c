@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <memory.h>
 #include <string.h>
 #include <assert.h>
 
@@ -149,17 +148,30 @@ int findWordIdRec(TreeNode *root, char *word) {
     }
 }
 
-
+/**
+ * Creates new node to insert in the binary search tree
+ * assign memory to new word and updates counter or wordId
+ * @param word
+ * @return
+ */
 TreeNode *createNode(char *word) {
-    static unsigned short index = 0;
+    static unsigned short wordId = 0;
     TreeNode *newNode = (TreeNode *) malloc(sizeof(TreeNode));
+    assert(newNode);
     newNode->word = (char *) calloc(strlen(word) + 1, sizeof(char));
-    newNode->wordId = index;
+    assert(newNode->word);
+    newNode->wordId = wordId;
     newNode->left = newNode->right = NULL;
-    index++;
+    wordId++;
     return newNode;
 }
 
+/**
+ * Updates binary search tree with new word
+ * in case word exists it won't be inserted
+ * @param wt
+ * @param word
+ */
 void updateTree(WordTree *wt, char *word) {
     updateTreeRec(wt->root, word);
 }
