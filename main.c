@@ -45,6 +45,8 @@ int compareShorts(const void * a, const void * b);
 
 Document processToDoc(char * docStr, WordTree * wt);
 
+void printDoc(Document * doc);
+
 int main() {
     buildTree("./reuters_train.txt");
 }
@@ -260,6 +262,14 @@ Document processToDoc(char * docStr, WordTree * wt) {
     return result;
 }
 
+/**
+ * Prints a Document to the stdout.
+ * @param doc
+ */
 void printDoc(Document * doc) {
-
+    printf("docLength:%d wordIds:", doc->docLength);
+    for (int i = 0; i < (int)doc->docLength; i++) {
+        printf("%d ", doc->wordIdArr[i]);
+    }
+    printf("\n");
 }
