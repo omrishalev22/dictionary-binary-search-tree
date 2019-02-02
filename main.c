@@ -349,14 +349,14 @@ void documentFileToDocArr(char * filename, WordTree * wt,
     assert(documentsArr);
     rawDocumentsArr = (char ***)malloc(physicalSize * sizeof(char **));
     assert(rawDocumentsArr);
-
     char line[SIZE];
 
     while (fgets(line, SIZE, file)) {
-        // Todo: help here
-        documentsArr[logicalSize] = &processToDoc(line, wt);
-        // Todo: here too
-        rawDocumentsArr = &line;
+        char * newLine = (char *) malloc(strlen(line)+1);
+
+        Document doc = processToDoc(line, wt);
+        documentsArr[logicalSize] = &doc;
+        rawDocumentsArr[logicalSize] = &newLine;
 
         logicalSize++;
 
@@ -368,7 +368,7 @@ void documentFileToDocArr(char * filename, WordTree * wt,
         }
     }
 
-    documentsArr = realloc(documentsArr, logicalSize * sizeof(Document *));
-    rawDocumentsArr = realloc(rawDocumentsArr, logicalSize * sizeof(char **));
+    *documentsArr = realloc(documentsArr, logicalSize * sizeof(Document *));
+    *rawDocumentsArr = realloc(rawDocumentsArr, logicalSize * sizeof(char **));
     fclose(file);
 }
