@@ -18,6 +18,8 @@ TreeNode * createNode (char  * word);
 int isWord(char * token);
 void processLine(char * line, WordTree * wordTree);
 
+int findWordId(WordTree * wt, char *word);
+int findWordIdRec(TreeNode * root, char *word);
 
 int main() {
     buildTree("./reuters_train.txt");
@@ -81,4 +83,44 @@ WordTree buildTree(char * fileName) {
     free(line);
     fclose(file);
     return wordTree;
+}
+
+
+// Part 2
+
+/**
+ * This method get a word tree, and a word. The method will search for the word in the
+ * word tree, and will return it's wordId.
+ * Will return -1 if the word is not found.
+ * @param wt
+ * @param word
+ * @return
+ */
+int findWordId(WordTree * wt, char *word) {
+    return findWordIdRec(wt->root, word);
+}
+
+/**
+ * This is the recursive method of findWordId, used to find the wordId of a specific word.
+ * @param root
+ * @param word
+ * @return
+ */
+int findWordIdRec(TreeNode * root, char *word) {
+    if (root == NULL) {
+        return -1;
+    }
+
+    int compareResults = strcmp(root->word, word);
+
+    if (compareResults == 0) {
+        // We found our word
+        return (int)root->wordId;
+    } else if (compareResults > 0) {
+        // We need to look for words in the left side of the tree node
+        return findWordIdRec(root->left, word);
+    } else {
+        // We need to look for words in the right side of the tree node
+        return findWordIdRec(root->right, word);
+    }
 }
