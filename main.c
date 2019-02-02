@@ -38,8 +38,6 @@ int findWordId(WordTree *wt, char *word);
 
 int findWordIdRec(TreeNode *root, char *word);
 
-void updateTree(WordTree *wt, char *word);
-
 void toLowerCase(char * word);
 
 TreeNode *updateTreeRec(TreeNode *node, char *word);
