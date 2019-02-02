@@ -43,8 +43,23 @@ void updateTree(WordTree *wt, char *word);
 
 TreeNode *updateTreeRec(TreeNode *node, char *word);
 
+void verifyMemoryAllocation(void *ptr);
+
 int main() {
     buildTree("./reuters_train.txt");
+}
+
+/**
+ * Verifies memory allocation.
+ * @param ptr
+ */
+void verifyMemoryAllocation(void *ptr)
+{
+    if (ptr == NULL)
+    {
+        puts("Memory allocation error detected!");
+        exit(1);
+    }
 }
 
 /**
