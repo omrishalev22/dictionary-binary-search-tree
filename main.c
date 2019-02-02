@@ -243,6 +243,12 @@ void FreeTreeRec(TreeNode *root)
     }
 }
 
+/**
+ * Comparison function between 2 shorts used with qsort.
+ * @param a
+ * @param b
+ * @return
+ */
 int compareShorts(const void * a, const void * b) {
     return ( *(short*)a - *(short*)b );
 }
@@ -273,16 +279,18 @@ int isNumberExistsInArr(unsigned short * arr, unsigned int size, unsigned short 
  */
 Document processToDoc(char * docStr, WordTree * wt) {
     char *word;
-    int i, isWordIdExists, currentWordId;
+    int currentWordId;
     unsigned int logicalSize = 0, physicalSize = 1;
     unsigned short * wordIds = (unsigned short *)malloc(physicalSize * sizeof(unsigned short));
-    Document result;
+    Document *result;
+
+    // Initialize document in memory
+    result = (Document *)malloc(sizeof(Document));
+    assert(result);
 
     word = strtok(docStr, SPACE);
 
     while (word != NULL) {
-        isWordIdExists = 0;
-
         // Get word ID for current word
         currentWordId = findWordId(wt, word);
 
@@ -308,10 +316,9 @@ Document processToDoc(char * docStr, WordTree * wt) {
     wordIds = realloc(wordIds, logicalSize * sizeof(unsigned short));
     qsort(wordIds, logicalSize, sizeof(unsigned short), compareShorts);
 
-    // Todo: check if we need to allocate memory to Doc
-    result.docLength = logicalSize;
-    result.wordIdArr = wordIds;
-    return result;
+    result->docLength = logicalSize;
+    result->wordIdArr = wordIds;
+    return *result;
 }
 
 /**
