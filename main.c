@@ -434,7 +434,7 @@ int docSimTrain(Document * testDoc,
  */
 float docSimBinary(Document *doc1, Document *doc2) {
     float counter = 0;
-    int indexDoc1, indexDoc2;
+    int indexDoc1 = 0, indexDoc2 = 0;
     int doc1Size = doc1->docLength, doc2Size = doc2->docLength;
 
     while (doc1Size && doc2Size) {
