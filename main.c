@@ -47,8 +47,17 @@ Document processToDoc(char * docStr, WordTree * wt);
 
 void printDoc(Document * doc);
 
+void documentFileToDocArr(char * filename, WordTree * wt,
+                          Document ** documentsArr, char *** rawDocumentsArr, int * numDocs);
+
 int main() {
-    buildTree("./reuters_train.txt");
+    char * fileName = "./reuters_train.txt";
+    Document **trainDocsArr;
+    char ***rawDocumentsArr;
+    int trainNumDocs;
+    WordTree wordTree = buildTree(fileName);
+
+    documentFileToDocArr(fileName, &wordTree, trainDocsArr, rawDocumentsArr, &trainNumDocs);
 }
 
 /**
@@ -272,4 +281,35 @@ void printDoc(Document * doc) {
         printf("%d ", doc->wordIdArr[i]);
     }
     printf("\n");
+}
+
+void documentFileToDocArr(char * filename, WordTree * wt,
+                          Document ** documentsArr, char *** rawDocumentsArr, int * numDocs) {
+    FILE *file = fopen(filename, "r");
+    unsigned int logicalSize = 0, physicalSize = 1;
+
+    documentsArr = malloc(physicalSize * sizeof(Document *));
+    rawDocumentsArr = malloc(physicalSize * sizeof(char **));
+
+    char line[SIZE];
+
+    while (fgets(line, SIZE, file)) {
+        // Todo: help here
+        *documentsArr[logicalSize] = &processToDoc(line, wt);
+        // Todo: here too
+        rawDocumentsArr = &line;
+
+        logicalSize++;
+
+        // Extend memory space if needed
+        if (logicalSize == physicalSize) {
+            physicalSize *= 2;
+            documentsArr = realloc(documentsArr, physicalSize * sizeof(Document *));
+            rawDocumentsArr = realloc(rawDocumentsArr, physicalSize * sizeof(char **));
+        }
+    }
+
+    documentsArr = realloc(documentsArr, logicalSize * sizeof(Document *));
+    rawDocumentsArr = realloc(rawDocumentsArr, logicalSize * sizeof(char **));
+    fclose(file);
 }
