@@ -6,6 +6,7 @@
 
 #define SIZE 150
 #define SPACE " "
+#define AMOUNT_OF_INPUT_SENTENCES 5
 
 typedef struct treeNode {
     char *word;
@@ -57,20 +58,29 @@ void FreeTreeRec(TreeNode *root);
 void documentFileToDocArr(char * filename, WordTree * wt,
                           Document ** documentsArr, char *** rawDocumentsArr, int * numDocs);
 
-int main() {
-    char * fileName = "../reuters_train.txt";
-    Document **trainDocsArr;
-    char ***rawDocumentsArr;
-    int trainNumDocs;
-    WordTree wordTree = buildTree(fileName);
+int docSimTrain(Document * testDoc, Document ** trainDocumentsArr);
 
-    char buff[80];
-    strcpy (buff, "This whale is a blue whale");
-    Document a=processToDoc(buff, &wordTree);
-    printDoc(&a);
+int main() {
+    char *fileName = "../reuters_train.txt", *docStr;
+    Document **trainDocsArr, testDoc;
+    char ***rawDocumentsArr;
+    int trainNumDocs, docIdx, i;
+
+    WordTree wordTree = buildTree(fileName);
+    printf("wordTree successfully built...");
+
+    documentFileToDocArr(fileName, &wordTree, trainDocsArr, rawDocumentsArr, &trainNumDocs);
+    printf("train file read and processed...");
+
+    for (i = 0; i < AMOUNT_OF_INPUT_SENTENCES; i++) {
+        printf("enter sentence %d/%d    :", i, AMOUNT_OF_INPUT_SENTENCES);
+        gets(docStr);
+        testDoc = processToDoc(docStr, &wordTree);
+        docIdx = docSimTrain(&testDoc, trainDocsArr);
+        printf("best matching train document: %d %s", docIdx, *rawDocumentsArr[docIdx]);
+    }
 
     FreeTree(wordTree);
-//    documentFileToDocArr(fileName, &wordTree, trainDocsArr, rawDocumentsArr, &trainNumDocs);
 }
 
 /**
@@ -295,6 +305,8 @@ Document processToDoc(char * docStr, WordTree * wt) {
     wordIds = (unsigned short *)malloc(physicalSize * sizeof(unsigned short));
     assert(wordIds);
 
+
+    // Todo: Work also with all cases , not only spaces!
     word = strtok(docStr, " ");
 
     while (word != NULL) {
@@ -363,12 +375,33 @@ void documentFileToDocArr(char * filename, WordTree * wt,
         // Extend memory space if needed
         if (logicalSize == physicalSize) {
             physicalSize *= 2;
-            documentsArr = realloc(documentsArr, physicalSize * sizeof(Document *));
-            rawDocumentsArr = realloc(rawDocumentsArr, physicalSize * sizeof(char **));
+            documentsArr = (Document **)realloc(documentsArr, physicalSize * sizeof(Document *));
+            rawDocumentsArr = (char ***)realloc(rawDocumentsArr, physicalSize * sizeof(char **));
         }
     }
 
-    *documentsArr = realloc(documentsArr, logicalSize * sizeof(Document *));
-    *rawDocumentsArr = realloc(rawDocumentsArr, logicalSize * sizeof(char **));
+    *documentsArr = (Document **)realloc(documentsArr, logicalSize * sizeof(Document *));
+    *rawDocumentsArr = (char ***)realloc(rawDocumentsArr, logicalSize * sizeof(char **));
+    *numDocs = logicalSize;
+
     fclose(file);
+}
+
+
+int docSimTrain(Document * testDoc,
+                Document ** trainDocumentsArr) {
+    // Todo: Check if DocumentArr is a thing or not
+    int i = 0, matchIndex = 0;
+    float maxSimValue = 0, tempSimValue;
+
+    while (trainDocumentsArr[i] != NULL) {
+        tempSimValue = docSimBinary(testDoc, trainDocumentsArr[i]);
+        if (tempSimValue > maxSimValue) {
+            matchIndex = i;
+            maxSimValue = tempSimValue;
+        }
+        i++;
+    }
+
+    return matchIndex;
 }
