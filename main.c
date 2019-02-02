@@ -50,6 +50,11 @@ Document processToDoc(char * docStr, WordTree * wt);
 
 void printDoc(Document * doc);
 
+void FreeTree(WordTree tr);
+
+void FreeTreeRec(TreeNode *root);
+
+
 void documentFileToDocArr(char * filename, WordTree * wt,
                           Document ** documentsArr, char *** rawDocumentsArr, int * numDocs);
 
@@ -59,7 +64,7 @@ int main() {
     char ***rawDocumentsArr;
     int trainNumDocs;
     WordTree wordTree = buildTree(fileName);
-
+    FreeTree(wordTree);
 //    documentFileToDocArr(fileName, &wordTree, trainDocsArr, rawDocumentsArr, &trainNumDocs);
 }
 
@@ -222,11 +227,7 @@ TreeNode *updateTreeRec(TreeNode *node, char *word) {
 }
 
 
-
-/*
-// TODO
-void FreeTree(Tree tr)
-{
+void FreeTree(WordTree tr) {
     FreeTreeRec(tr.root);
 }
 
@@ -238,7 +239,7 @@ void FreeTreeRec(TreeNode *root)
         FreeTreeRec(root->right);
         free(root);
     }
-}*/
+}
 
 int compareShorts(const void * a, const void * b) {
     return ( *(short*)a - *(short*)b );
