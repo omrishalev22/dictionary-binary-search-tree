@@ -20,9 +20,7 @@ void processLine(char * line, WordTree * wordTree);
 
 
 int main() {
-    FILE * f = fopen("./reuters_train.txt","r");
-    buildTree(f);
-
+    buildTree("./reuters_train.txt");
 }
 
 /**
@@ -60,6 +58,27 @@ void processLine(char * line, WordTree * wordTree) {
     }
 }
 
+/**
+ * This method get a file name, reads it content and prases every line of the file.
+ * Will return a wordTree generated from the file contents.
+ * @param fileName
+ * @return
+ */
 WordTree buildTree(char * fileName) {
+    FILE *file = fopen(fileName, "r");
+    char line[150];
 
+    // Initialize the tree
+    WordTree wordTree;
+    wordTree.root = NULL;
+
+    // Read every line, and process it
+    while (fgets(line, sizeof(line), file)) {
+        processLine(line, &wordTree);
+    }
+
+    // Todo: check if we need to free the line or not
+    free(line);
+    fclose(file);
+    return wordTree;
 }
