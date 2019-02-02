@@ -352,6 +352,17 @@ void printDoc(Document * doc) {
     printf("\n");
 }
 
+/**
+ * This method will read a file with sentences, parse them to documents
+ * and will save the documents and the sentences into documentsArr and
+ * rawDocumentsArr.
+ * In addition, it will save the amount of generated documents in numDocs.
+ * @param filename
+ * @param wt
+ * @param documentsArr
+ * @param rawDocumentsArr
+ * @param numDocs
+ */
 void documentFileToDocArr(char * filename, WordTree * wt,
                           Document ** documentsArr, char *** rawDocumentsArr, int * numDocs) {
     FILE *file = fopen(filename, "r");
@@ -388,6 +399,13 @@ void documentFileToDocArr(char * filename, WordTree * wt,
 }
 
 
+/**
+ * This method get a document and a list of documents, and using docSimBinary
+ * method it will find the index of the document which has highest similarity, from the documents array.
+ * @param testDoc
+ * @param trainDocumentsArr
+ * @return
+ */
 int docSimTrain(Document * testDoc,
                 Document ** trainDocumentsArr) {
     // Todo: Check if DocumentArr is a thing or not
