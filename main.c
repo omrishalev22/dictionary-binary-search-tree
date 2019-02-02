@@ -3,6 +3,8 @@
 #include <memory.h>
 #include <string.h>
 
+#define SIZE 150
+
 typedef struct treeNode {
     char *word;
     unsigned short wordId;
@@ -19,11 +21,6 @@ typedef struct document {
     unsigned short *wordIdArr;
 } Document;
 
-WordTree buildTree(char *fileName);
-
-void updateTree(WordTree *wt, char *word);
-
-TreeNode *createNode(char *word);
 
 int isWord(char *token);
 
@@ -90,14 +87,14 @@ void processLine(char *line, WordTree *wordTree) {
  */
 WordTree buildTree(char *fileName) {
     FILE *file = fopen(fileName, "r");
-    char line[150];
+    char line[SIZE];
 
     // Initialize the tree
     WordTree wordTree;
     wordTree.root = NULL;
 
     // Read every line, and process it
-    while (fgets(line, sizeof(line), file)) {
+    while (fgets(line, SIZE, file)) {
         processLine(line, &wordTree);
     }
 
@@ -105,8 +102,6 @@ WordTree buildTree(char *fileName) {
     return wordTree;
 }
 
-
-// Part 2
 
 /**
  * This method get a word tree, and a word. The method will search for the word in the
