@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <string.h>
+#include <assert.h>
 
 #define SIZE 150
 
@@ -40,23 +41,8 @@ void updateTree(WordTree *wt, char *word);
 
 TreeNode *updateTreeRec(TreeNode *node, char *word);
 
-void verifyMemoryAllocation(void *ptr);
-
 int main() {
     buildTree("./reuters_train.txt");
-}
-
-/**
- * Verifies memory allocation.
- * @param ptr
- */
-void verifyMemoryAllocation(void *ptr)
-{
-    if (ptr == NULL)
-    {
-        puts("Memory allocation error detected!");
-        exit(1);
-    }
 }
 
 /**
@@ -102,6 +88,8 @@ void processLine(char *line, WordTree *wordTree) {
  */
 WordTree buildTree(char *fileName) {
     FILE *file = fopen(fileName, "r");
+    assert(file != NULL);
+
     char line[SIZE];
 
     // Initialize the tree
