@@ -142,9 +142,12 @@ int findWordIdRec(TreeNode *root, char *word) {
 
 
 TreeNode *createNode(char *word) {
+    static unsigned short index = 0;
     TreeNode *newNode = (TreeNode *) malloc(sizeof(TreeNode));
     newNode->word = (char *) calloc(strlen(word) + 1, sizeof(char));
+    newNode->wordId = index;
     newNode->left = newNode->right = NULL;
+    index++;
     return newNode;
 }
 
