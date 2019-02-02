@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <memory.h>
 #include <string.h>
 
 typedef struct treeNode {
@@ -12,19 +14,34 @@ typedef struct tree {
     TreeNode *root;
 } WordTree;
 
-typedef struct document{
+typedef struct document {
     unsigned int docLength;
-    unsigned short * wordIdArr;
+    unsigned short *wordIdArr;
 } Document;
 
-WordTree buildTree(char * fileName);
-void updateTree(WordTree *wt, char * word);
-TreeNode * createNode (char  * word);
-int isWord(char * token);
-void processLine(char * line, WordTree * wordTree);
+WordTree buildTree(char *fileName);
 
-int findWordId(WordTree * wt, char *word);
-int findWordIdRec(TreeNode * root, char *word);
+void updateTree(WordTree *wt, char *word);
+
+TreeNode *createNode(char *word);
+
+int isWord(char *token);
+
+void processLine(char *line, WordTree *wordTree);
+
+WordTree buildTree(char *fileName);
+
+void updateTree(WordTree *wt, char *word);
+
+TreeNode *createNode(char *word);
+
+int findWordId(WordTree *wt, char *word);
+
+int findWordIdRec(TreeNode *root, char *word);
+
+void updateTree(WordTree *wt, char *word);
+
+TreeNode *updateTreeRec(TreeNode *node, char *word);
 
 int main() {
     buildTree("./reuters_train.txt");
@@ -36,7 +53,7 @@ int main() {
  * @param token
  * @return
  */
-int isWord(char * token) {
+int isWord(char *token) {
     for (int i = 0; i < strlen(token); i++) {
         if (token[i] < 'a' || token[i] > 'z') {
             return 0;
@@ -52,7 +69,7 @@ int isWord(char * token) {
  * @param line
  * @param wordTree
  */
-void processLine(char * line, WordTree * wordTree) {
+void processLine(char *line, WordTree *wordTree) {
     char *token, *delimiters = " ,.;:?!-\t'()[]{}<>~_";
     token = strtok(line, delimiters);
 
@@ -71,7 +88,7 @@ void processLine(char * line, WordTree * wordTree) {
  * @param fileName
  * @return
  */
-WordTree buildTree(char * fileName) {
+WordTree buildTree(char *fileName) {
     FILE *file = fopen(fileName, "r");
     char line[150];
 
@@ -84,8 +101,6 @@ WordTree buildTree(char * fileName) {
         processLine(line, &wordTree);
     }
 
-    // Todo: check if we need to free the line or not
-    free(line);
     fclose(file);
     return wordTree;
 }
@@ -101,7 +116,7 @@ WordTree buildTree(char * fileName) {
  * @param word
  * @return
  */
-int findWordId(WordTree * wt, char *word) {
+int findWordId(WordTree *wt, char *word) {
     return findWordIdRec(wt->root, word);
 }
 
@@ -111,7 +126,7 @@ int findWordId(WordTree * wt, char *word) {
  * @param word
  * @return
  */
-int findWordIdRec(TreeNode * root, char *word) {
+int findWordIdRec(TreeNode *root, char *word) {
     if (root == NULL) {
         return -1;
     }
@@ -120,7 +135,7 @@ int findWordIdRec(TreeNode * root, char *word) {
 
     if (compareResults == 0) {
         // We found our word
-        return (int)root->wordId;
+        return (int) root->wordId;
     } else if (compareResults > 0) {
         // We need to look for words in the left side of the tree node
         return findWordIdRec(root->left, word);
@@ -128,4 +143,38 @@ int findWordIdRec(TreeNode * root, char *word) {
         // We need to look for words in the right side of the tree node
         return findWordIdRec(root->right, word);
     }
+}
+
+
+TreeNode *createNode(char *word) {
+    TreeNode *newNode = (TreeNode *) malloc(sizeof(TreeNode));
+    newNode->word = (char *) calloc(strlen(word) + 1, sizeof(char));
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+void updateTree(WordTree *wt, char *word) {
+    updateTreeRec(wt->root, word);
+}
+
+/**
+ * Function recursively go over the tree and insert new word
+ * based on its lexicography order, bigger goes right, smaller left.
+ * if word exists it will not be inserted into tree again.
+ * @param node
+ * @param word
+ * @return
+ */
+TreeNode *updateTreeRec(TreeNode *node, char *word) {
+    if (node == NULL) return createNode(word);
+
+    int isLexBigger = strcmp(word, node->word);
+
+    if (isLexBigger < 0) {
+        node->left = updateTreeRec(node->left, word);
+    } else if (isLexBigger > 0) {
+        node->right = updateTreeRec(node->right, word);
+    }
+
+    return node;
 }
