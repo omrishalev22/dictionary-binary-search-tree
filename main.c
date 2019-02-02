@@ -51,9 +51,9 @@ Document processToDoc(char *docStr, WordTree *wt);
 
 void printDoc(Document *doc);
 
-void FreeTree(WordTree tr);
+void freeTree(WordTree tr);
 
-void FreeTreeRec(TreeNode *root);
+void freeTreeRec(TreeNode *root);
 
 void documentFileToDocArr(char *filename, WordTree *wt,
                           Document **documentsArr, char ***rawDocumentsArr, int *numDocs);
@@ -61,6 +61,12 @@ void documentFileToDocArr(char *filename, WordTree *wt,
 int docSimTrain(Document * testDoc, Document ** trainDocumentsArr);
 
 float docSimBinary(Document *doc1, Document *doc2);
+
+void freeDocument(Document * document);
+
+void freeArrayOfDocuments(Document **documents, int size);
+
+void freeArrayOfCharArrays(char ***arr, int size);
 
 int main() {
     char *fileName = "../reuters_train.txt", *docStr;
@@ -76,6 +82,7 @@ int main() {
 
     for (i = 0; i < AMOUNT_OF_INPUT_SENTENCES; i++) {
         printf("enter sentence %d/%d    :", i, AMOUNT_OF_INPUT_SENTENCES);
+        // Todo: check if using gets is ok
         gets(docStr);
         testDoc = processToDoc(docStr, &wordTree);
         docIdx = docSimTrain(&testDoc, trainDocsArr);
@@ -84,8 +91,12 @@ int main() {
 
     documentFileToDocArr(fileName, &wordTree, &trainDocsArr, &rawDocumentsArr, &trainNumDocs);
     docSimBinary(trainDocsArr[0],trainDocsArr[1]);
-    FreeTree(wordTree);
-//    documentFileToDocArr(fileName, &wordTree, trainDocsArr, rawDocumentsArr, &trainNumDocs);
+
+    // Free the memory
+    freeTree(wordTree);
+    freeArrayOfDocuments(trainDocsArr, trainNumDocs);
+    freeDocument(&testDoc);
+    freeArrayOfCharArrays(rawDocumentsArr, trainNumDocs);
 }
 
 /**
@@ -247,14 +258,14 @@ TreeNode *updateTreeRec(TreeNode *node, char *word) {
 }
 
 
-void FreeTree(WordTree tr) {
-    FreeTreeRec(tr.root);
+void freeTree(WordTree tr) {
+    freeTreeRec(tr.root);
 }
 
-void FreeTreeRec(TreeNode *root) {
+void freeTreeRec(TreeNode *root) {
     if (root != NULL) {
-        FreeTreeRec(root->left);
-        FreeTreeRec(root->right);
+        freeTreeRec(root->left);
+        freeTreeRec(root->right);
         free(root);
     }
 }
@@ -454,4 +465,37 @@ float docSimBinary(Document *doc1, Document *doc2) {
     }
 
     return counter;
+}
+
+/**
+ * Frees document struct from the memory.
+ * @param document
+ */
+void freeDocument(Document * document) {
+    free(document->wordIdArr);
+    free(document);
+}
+
+/**
+ * Frees array of document structs from the memory.
+ * @param documents
+ */
+void freeArrayOfDocuments(Document **documents, int size) {
+    for (int i = 0; i < size; i ++) {
+        freeDocument(documents[i]);
+    }
+    free(documents);
+}
+
+/**
+ * Frees array of char arrays from the memory.
+ * @param arr
+ * @param size
+ * @return
+ */
+void freeArrayOfCharArrays(char ***arr, int size) {
+    for (int i = 0; i < size; i ++) {
+        free(arr[i]);
+    }
+    free(arr);
 }
