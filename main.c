@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <ctype.h>
 
 #define SIZE 150
-#define SPACE " "
+#define SPACE ' '
 
 typedef struct treeNode {
     char *word;
@@ -39,6 +40,8 @@ int findWordIdRec(TreeNode *root, char *word);
 
 void updateTree(WordTree *wt, char *word);
 
+void toLowerCase(char * word);
+
 TreeNode *updateTreeRec(TreeNode *node, char *word);
 
 int compareShorts(const void * a, const void * b);
@@ -51,7 +54,7 @@ void documentFileToDocArr(char * filename, WordTree * wt,
                           Document ** documentsArr, char *** rawDocumentsArr, int * numDocs);
 
 int main() {
-    char * fileName = "./reuters_train.txt";
+    char * fileName = "../reuters_train.txt";
     Document **trainDocsArr;
     char ***rawDocumentsArr;
     int trainNumDocs;
@@ -67,10 +70,14 @@ int main() {
  * @return
  */
 int isWord(char *token) {
-    for (int i = 0; i < strlen(token); i++) {
-        if (token[i] < 'a' || token[i] > 'z') {
+    int i;
+    for (i = 0; i < strlen(token); i++) {
+
+        // check if char ASCII is outside the ABCabc boundaries
+        if (token[i] < 'A' && token[i] > 'z') {
             return 0;
         }
+        token[i] = (char)tolower(token[i]);
     }
 
     return 1;
@@ -83,7 +90,7 @@ int isWord(char *token) {
  * @param wordTree
  */
 void processLine(char *line, WordTree *wordTree) {
-    char *token, *delimiters = " ,.;:?!-\t'()[]{}<>~_";
+    char *token, *delimiters = SPACE;
     token = strtok(line, delimiters);
 
     while (token != NULL) {
@@ -103,7 +110,7 @@ void processLine(char *line, WordTree *wordTree) {
  */
 WordTree buildTree(char *fileName) {
     FILE *file = fopen(fileName, "r");
-    assert(file != NULL);
+    assert(file);
 
     char line[SIZE];
 
@@ -171,6 +178,7 @@ TreeNode *createNode(char *word) {
     assert(newNode);
     newNode->word = (char *) calloc(strlen(word) + 1, sizeof(char));
     assert(newNode->word);
+    strcpy(newNode->word,word);
     newNode->wordId = wordId;
     newNode->left = newNode->right = NULL;
     wordId++;
@@ -184,6 +192,10 @@ TreeNode *createNode(char *word) {
  * @param word
  */
 void updateTree(WordTree *wt, char *word) {
+    if(wt-> root == NULL) {
+        wt->root = createNode(word);
+        return;
+    }
     updateTreeRec(wt->root, word);
 }
 
@@ -208,6 +220,25 @@ TreeNode *updateTreeRec(TreeNode *node, char *word) {
 
     return node;
 }
+
+
+
+/*
+// TODO
+void FreeTree(Tree tr)
+{
+    FreeTreeRec(tr.root);
+}
+
+void FreeTreeRec(TreeNode *root)
+{
+    if (root != NULL)
+    {
+        FreeTreeRec(root->left);
+        FreeTreeRec(root->right);
+        free(root);
+    }
+}*/
 
 int compareShorts(const void * a, const void * b) {
     return ( *(short*)a - *(short*)b );
