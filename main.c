@@ -89,9 +89,6 @@ int main() {
         printf("best matching train document: %d %s", docIdx, *rawDocumentsArr[docIdx]);
     }
 
-    documentFileToDocArr(fileName, &wordTree, &trainDocsArr, &rawDocumentsArr, &trainNumDocs);
-    docSimBinary(trainDocsArr[0],trainDocsArr[1]);
-
     // Free the memory
     freeTree(wordTree);
     freeArrayOfDocuments(trainDocsArr, trainNumDocs);
@@ -380,9 +377,9 @@ void documentFileToDocArr(char *filename, WordTree *wt,
     FILE *file = fopen(filename, "r");
     unsigned int logicalSize = 0, physicalSize = 1;
 
-    *documentsArr = (Document *) malloc(physicalSize * sizeof(Document ));
+    *documentsArr = (Document *) malloc(physicalSize * sizeof(Document *));
     assert(documentsArr);
-    *rawDocumentsArr = (char **) malloc(physicalSize * sizeof(char *));
+    *rawDocumentsArr = (char **) malloc(physicalSize * sizeof(char **));
     assert(rawDocumentsArr);
     char line[SIZE];
 
@@ -400,13 +397,13 @@ void documentFileToDocArr(char *filename, WordTree *wt,
         // Extend memory space if needed
         if (logicalSize == physicalSize) {
             physicalSize *= 2;
-            *documentsArr = (Document **)realloc(*documentsArr, physicalSize * sizeof(Document *));
-            *rawDocumentsArr = (char ***)realloc(*rawDocumentsArr, physicalSize * sizeof(char **));
+            *documentsArr = (Document *)realloc(*documentsArr, physicalSize * sizeof(Document *));
+            *rawDocumentsArr = (char **)realloc(*rawDocumentsArr, physicalSize * sizeof(char **));
         }
     }
 
-    *documentsArr = (Document **)realloc(*documentsArr, logicalSize * sizeof(Document *));
-    *rawDocumentsArr = (char ***)realloc(**rawDocumentsArr, logicalSize * sizeof(char **));
+    *documentsArr = (Document *)realloc(*documentsArr, logicalSize * sizeof(Document *));
+    *rawDocumentsArr = (char **)realloc(**rawDocumentsArr, logicalSize * sizeof(char **));
     *numDocs = logicalSize;
     fclose(file);
 }
