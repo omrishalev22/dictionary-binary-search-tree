@@ -58,7 +58,7 @@ void freeTreeRec(TreeNode *root);
 void documentFileToDocArr(char *filename, WordTree *wt,
                           Document **documentsArr, char ***rawDocumentsArr, int *numDocs);
 
-int docSimTrain(Document * testDoc, Document * trainDocumentsArr);
+int docSimTrain(Document * testDoc, Document ** trainDocumentsArr, int numDocsTrain);
 
 float docSimBinary(Document *doc1, Document *doc2);
 
@@ -69,7 +69,7 @@ void freeArrayOfDocuments(Document **documents, int size);
 void freeArrayOfCharArrays(char ***arr, int size);
 
 int main() {
-    char *fileName = "../reuters_train.txt", *docStr;
+    char *fileName = "../reuters_train.txt", docStr[SIZE];
     Document *trainDocsArr, testDoc;
     char **rawDocumentsArr;
     int trainNumDocs, docIdx, i;
@@ -85,8 +85,8 @@ int main() {
         // Todo: check if using gets is ok
         gets(docStr);
         testDoc = processToDoc(docStr, &wordTree);
-        docIdx = docSimTrain(&testDoc, trainDocsArr);
-        printf("best matching train document: %d %s", docIdx, *rawDocumentsArr[docIdx]);
+        docIdx = docSimTrain(&testDoc, &trainDocsArr,trainNumDocs);
+        printf("best matching train document: %d %s", docIdx, rawDocumentsArr[docIdx]);
     }
 
     // Free the memory
@@ -424,21 +424,19 @@ void documentFileToDocArr(char *filename, WordTree *wt,
  * @return
  */
 int docSimTrain(Document * testDoc,
-                Document * trainDocumentsArr) {
+                Document ** trainDocumentsArr,int numDocsTrain) {
     // Todo: Check if DocumentArr is a thing or not
     int i = 0, matchIndex = 0;
     float maxSimValue = 0, tempSimValue;
-/*
 
-    while (trainDocumentsArr[i]. != NULL) {
-        tempSimValue = docSimBinary(testDoc, trainDocumentsArr);
+    while (trainDocumentsArr[i] != NULL) {
+        tempSimValue = docSimBinary(testDoc, *trainDocumentsArr);
         if (tempSimValue > maxSimValue) {
             matchIndex = i;
             maxSimValue = tempSimValue;
         }
         i++;
     }
-*/
 
     return matchIndex;
 }
