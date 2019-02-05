@@ -405,6 +405,9 @@ void documentFileToDocArr(char *filename, WordTree *wt,
             *documentsArr = realloc(*documentsArr, physicalSize * sizeof(Document));
             *rawDocumentsArr = realloc(*rawDocumentsArr, physicalSize * (sizeof(char **)));
         }
+
+        *documentsArr = realloc(*documentsArr, physicalSize * sizeof(Document));
+        *rawDocumentsArr = realloc(*rawDocumentsArr, physicalSize * (sizeof(char **)));
     }
 
 
@@ -419,24 +422,26 @@ void documentFileToDocArr(char *filename, WordTree *wt,
  * @param testDoc
  * @param trainDocumentsArr
  * @return
- *//*
+ */
 int docSimTrain(Document * testDoc,
-                Document ** trainDocumentsArr) {
+                Document * trainDocumentsArr) {
     // Todo: Check if DocumentArr is a thing or not
     int i = 0, matchIndex = 0;
     float maxSimValue = 0, tempSimValue;
+/*
 
-    while (trainDocumentsArr[i] != NULL) {
-        tempSimValue = docSimBinary(testDoc, trainDocumentsArr[i]);
+    while (trainDocumentsArr[i]. != NULL) {
+        tempSimValue = docSimBinary(testDoc, trainDocumentsArr);
         if (tempSimValue > maxSimValue) {
             matchIndex = i;
             maxSimValue = tempSimValue;
         }
         i++;
     }
+*/
 
     return matchIndex;
-}*/
+}
 
 /**
  * checks match ratio between two documents.
