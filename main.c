@@ -81,19 +81,19 @@ int main() {
     printf("train file read and processed...");
 
     for (i = 0; i < AMOUNT_OF_INPUT_SENTENCES; i++) {
-        printf("enter sentence %d/%d    :", i, AMOUNT_OF_INPUT_SENTENCES);
+        printf("enter sentence %d/%d:", i, AMOUNT_OF_INPUT_SENTENCES);
         // Todo: check if using gets is ok
         gets(docStr);
         testDoc = processToDoc(docStr, &wordTree);
         docIdx = docSimTrain(&testDoc, &trainDocsArr,trainNumDocs);
-        printf("best matching train document: %d %s", docIdx, rawDocumentsArr[docIdx]);
+        printf("best matching train document: %d %s\n", docIdx, rawDocumentsArr[docIdx]);
     }
 
     // Free the memory
     freeTree(wordTree);
-    freeArrayOfDocuments(trainDocsArr, trainNumDocs);
+    freeArrayOfDocuments(&trainDocsArr, trainNumDocs);
     freeDocument(&testDoc);
-    freeArrayOfCharArrays(rawDocumentsArr, trainNumDocs);
+    freeArrayOfCharArrays(&rawDocumentsArr, trainNumDocs);
 }
 
 /**
@@ -305,7 +305,7 @@ int isNumberExistsInArr(unsigned short *arr, unsigned int size, unsigned short n
  */
 Document processToDoc(char *docStr, WordTree *wt) {
     // TODO lowerCase docSTr, need to make a lowercase function on string
-    char *word;
+    char *word, tempDocStr[SIZE];
     int currentWordId;
     unsigned int logicalSize = 0, physicalSize = 1;
     unsigned short *wordIds;
@@ -316,9 +316,12 @@ Document processToDoc(char *docStr, WordTree *wt) {
     result = (Document *) malloc(sizeof(Document));
     assert(wordIds);
 
+    // Since strtok replaces the spaces with \0, we need to copy the
+    // string to another place in the memory in order not to corrupt the original docStr
+    strcpy( tempDocStr, docStr );
 
     // Todo: Work also with all cases , not only spaces!
-    word = strtok(docStr, " ");
+    word = strtok(tempDocStr, " ");
 
     while (word != NULL) {
         // Get word ID for current word
