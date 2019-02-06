@@ -64,9 +64,9 @@ float docSimBinary(Document *doc1, Document *doc2);
 
 void freeDocument(Document * document);
 
-void freeArrayOfDocuments(Document **documents, int size);
+void freeArrayOfDocuments(Document *documents, int size);
 
-void freeArrayOfCharArrays(char ***arr, int size);
+void freeArrayOfCharArrays(char **arr, int size);
 
 int main() {
     char *fileName = "../reuters_train.txt", docStr[SIZE];
@@ -91,9 +91,9 @@ int main() {
 
     // Free the memory
     freeTree(wordTree);
-    freeArrayOfDocuments(&trainDocsArr, trainNumDocs);
-    freeDocument(&testDoc);
-    freeArrayOfCharArrays(&rawDocumentsArr, trainNumDocs);
+    freeArrayOfDocuments(trainDocsArr, trainNumDocs);
+    free(testDoc.wordIdArr);
+    freeArrayOfCharArrays(rawDocumentsArr, trainNumDocs);
 }
 
 /**
@@ -487,9 +487,9 @@ void freeDocument(Document * document) {
  * Frees array of document structs from the memory.
  * @param documents
  */
-void freeArrayOfDocuments(Document **documents, int size) {
+void freeArrayOfDocuments(Document *documents, int size) {
     for (int i = 0; i < size; i ++) {
-        freeDocument(documents[i]);
+        freeDocument(documents + i);
     }
     free(documents);
 }
@@ -500,7 +500,7 @@ void freeArrayOfDocuments(Document **documents, int size) {
  * @param size
  * @return
  */
-void freeArrayOfCharArrays(char ***arr, int size) {
+void freeArrayOfCharArrays(char **arr, int size) {
     for (int i = 0; i < size; i ++) {
         free(arr[i]);
     }
