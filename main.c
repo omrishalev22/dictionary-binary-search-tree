@@ -432,13 +432,12 @@ int docSimTrain(Document * testDoc,
     int i = 0, matchIndex = 0;
     float maxSimValue = 0, tempSimValue;
 
-    while (trainDocumentsArr[i] != NULL) {
-        tempSimValue = docSimBinary(testDoc, *trainDocumentsArr);
+    for(i = 0 ; i < numDocsTrain ; i++){
+        tempSimValue = docSimBinary(testDoc, *trainDocumentsArr+i);
         if (tempSimValue > maxSimValue) {
             matchIndex = i;
             maxSimValue = tempSimValue;
         }
-        i++;
     }
 
     return matchIndex;
