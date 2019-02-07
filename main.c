@@ -78,10 +78,10 @@ int main() {
     int trainNumDocs, docIdx, i;
 
     WordTree wordTree = buildTree(fileName);
-    printf("wordTree successfully built...");
+    printf("wordTree successfully built...\n");
 
     documentFileToDocArr(fileName, &wordTree, &trainDocsArr, &rawDocumentsArr, &trainNumDocs);
-    printf("train file read and processed...");
+    printf("train file read and processed...\n\n");
 
     for (i = 0; i < AMOUNT_OF_INPUT_SENTENCES; i++) {
         printf("enter sentence %d/%d:", i, AMOUNT_OF_INPUT_SENTENCES);
