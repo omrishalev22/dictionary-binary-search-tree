@@ -428,7 +428,6 @@ void documentFileToDocArr(char *filename, WordTree *wt,
  */
 int docSimTrain(Document * testDoc,
                 Document ** trainDocumentsArr,int numDocsTrain) {
-    // Todo: Check if DocumentArr is a thing or not
     int i = 0, matchIndex = 0;
     float maxSimValue = 0, tempSimValue;
 
@@ -461,7 +460,7 @@ float docSimBinary(Document *doc1, Document *doc2) {
             indexDoc2++;
             doc1Size--;
             doc2Size--;
-        } else if (doc1->wordIdArr[indexDoc1] > doc2->wordIdArr[indexDoc2]) {
+        } else if (doc1->wordIdArr[indexDoc1] < doc2->wordIdArr[indexDoc2]) {
             indexDoc1++;
             doc1Size--;
         } else {
