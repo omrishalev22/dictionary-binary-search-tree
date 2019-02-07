@@ -7,6 +7,7 @@
 #define SIZE 150
 #define SPACE " "
 #define AMOUNT_OF_INPUT_SENTENCES 5
+#define DELIMITERS " ,.;:?!-\t'()[]{}<>~_"
 
 typedef struct treeNode {
     char *word;
@@ -68,6 +69,8 @@ void freeArrayOfDocuments(Document *documents, int size);
 
 void freeArrayOfCharArrays(char **arr, int size);
 
+void convertStringToLowercase(char *str);
+
 int main() {
     char *fileName = "../reuters_train.txt", docStr[SIZE];
     Document *trainDocsArr, testDoc;
@@ -82,7 +85,6 @@ int main() {
 
     for (i = 0; i < AMOUNT_OF_INPUT_SENTENCES; i++) {
         printf("enter sentence %d/%d:", i, AMOUNT_OF_INPUT_SENTENCES);
-        // Todo: check if using gets is ok
         gets(docStr);
         testDoc = processToDoc(docStr, &wordTree);
         docIdx = docSimTrain(&testDoc, &trainDocsArr,trainNumDocs);
@@ -110,7 +112,6 @@ int isWord(char *token) {
         if (token[i] < 'A' || token[i] > 'z') {
             return 0;
         }
-        token[i] = (char) tolower(token[i]);
     }
 
     return 1;
@@ -123,16 +124,16 @@ int isWord(char *token) {
  * @param wordTree
  */
 void processLine(char *line, WordTree *wordTree) {
-    // todo delimteres - check if we need to make it const / define or its fine hardcoded
-    char *token, *delimiters = " ,.;:?!-\t'()[]{}<>~_";
-    token = strtok(line, delimiters);
+    char *token;
+    token = strtok(line, DELIMITERS);
 
     while (token != NULL) {
         if (isWord(token)) {
+            convertStringToLowercase(token);
             updateTree(wordTree, token);
         }
 
-        token = strtok(NULL, delimiters);
+        token = strtok(NULL, DELIMITERS);
     }
 }
 
@@ -304,7 +305,6 @@ int isNumberExistsInArr(unsigned short *arr, unsigned int size, unsigned short n
  * @return
  */
 Document processToDoc(char *docStr, WordTree *wt) {
-    // TODO lowerCase docSTr, need to make a lowercase function on string
     char *word, tempDocStr[SIZE];
     int currentWordId;
     unsigned int logicalSize = 0, physicalSize = 1;
@@ -320,8 +320,10 @@ Document processToDoc(char *docStr, WordTree *wt) {
     // string to another place in the memory in order not to corrupt the original docStr
     strcpy( tempDocStr, docStr );
 
-    // Todo: Work also with all cases , not only spaces!
-    word = strtok(tempDocStr, " ");
+    // Lowercase the given string
+    convertStringToLowercase(tempDocStr);
+
+    word = strtok(tempDocStr, DELIMITERS);
 
     while (word != NULL) {
         // Get word ID for current word
@@ -343,7 +345,7 @@ Document processToDoc(char *docStr, WordTree *wt) {
         }
 
         // Get next word
-        word = strtok(NULL, SPACE);
+        word = strtok(NULL, DELIMITERS);
     }
 
     wordIds = realloc(wordIds, logicalSize * sizeof(unsigned short));
@@ -503,4 +505,14 @@ void freeArrayOfCharArrays(char **arr, int size) {
         free(arr[i]);
     }
     free(arr);
+}
+
+/**
+ * This method get a string and lowercase it.
+ * @param str
+ */
+void convertStringToLowercase(char *str) {
+    for (int i = 0; i < strlen(str); i++) {
+        str[i] = (char)tolower(str[i]);
+    }
 }
