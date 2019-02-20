@@ -5,7 +5,7 @@
 void findUserSearchingQueriesInFile(Document testDoc, WordTree wordTree, Document *trainDocsArr, int trainNumDocs,
                                     char **rawDocumentsArr);
 
-void freeMemoryAllocation(WordTree wordTree, Document *trainDocsArr, int trainNumDocs,Document testDoc, char **rawDocumentsArr);
+void freeMemoryAllocation(WordTree wordTree, Document *trainDocsArr, int trainNumDocs, char **rawDocumentsArr);
 
 int main() {
     char *fileName = "../reuters_train.txt";
@@ -21,7 +21,7 @@ int main() {
     printf("train file read and processed...\n\n");
 
     findUserSearchingQueriesInFile(testDoc, wordTree, trainDocsArr, trainNumDocs, rawDocumentsArr);
-    freeMemoryAllocation(wordTree, trainDocsArr, trainNumDocs,testDoc, rawDocumentsArr);
+    freeMemoryAllocation(wordTree, trainDocsArr, trainNumDocs, rawDocumentsArr);
 
 }
 
@@ -58,10 +58,9 @@ void findUserSearchingQueriesInFile(Document testDoc, WordTree wordTree, Documen
  * @param testDoc
  * @param rawDocumentsArr
  */
-void freeMemoryAllocation(WordTree wordTree, Document *trainDocsArr, int trainNumDocs,Document testDoc, char **rawDocumentsArr) {
+void freeMemoryAllocation(WordTree wordTree, Document *trainDocsArr, int trainNumDocs, char **rawDocumentsArr) {
     // Free the memory
     freeTree(wordTree);
     freeArrayOfDocuments(trainDocsArr, trainNumDocs);
-    free(testDoc.wordIdArr);
     freeArrayOfCharArrays(rawDocumentsArr, trainNumDocs);
 }

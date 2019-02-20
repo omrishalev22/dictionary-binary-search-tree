@@ -282,11 +282,10 @@ Document processToDoc(char *docStr, WordTree *wt) {
     int currentWordId;
     unsigned int logicalSize = 0, physicalSize = 1;
     unsigned short *wordIds;
-    Document * result = NULL;
+    Document result;
 
     // Initialize word Ids array
     wordIds = (unsigned short *) malloc(physicalSize * sizeof(unsigned short));
-    result = (Document *) malloc(sizeof(Document));
     assert(wordIds);
 
     // Since strtok replaces the spaces with \0, we need to copy the
@@ -324,9 +323,9 @@ Document processToDoc(char *docStr, WordTree *wt) {
     wordIds = realloc(wordIds, logicalSize * sizeof(unsigned short));
     qsort(wordIds, logicalSize, sizeof(unsigned short), compareShorts);
 
-    result->docLength = logicalSize;
-    result->wordIdArr = wordIds;
-    return *result;
+    result.docLength = logicalSize;
+    result.wordIdArr = wordIds;
+    return result;
 }
 
 /**
@@ -459,7 +458,6 @@ float docSimBinary(Document *doc1, Document *doc2) {
 void freeDocument(Document * document) {
     free(document->wordIdArr);
     document->wordIdArr = NULL;
-    free(document);
 }
 
 /**
