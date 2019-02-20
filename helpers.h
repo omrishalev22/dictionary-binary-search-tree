@@ -122,7 +122,6 @@ WordTree buildTree(char *fileName) {
     char line[SIZE];
 
     // Initialize the tree
-    // Todo: check if need to allocate memory to WordTree
     WordTree wordTree;
     wordTree.root = NULL;
 
@@ -354,10 +353,6 @@ void printDoc(Document *doc) {
 void documentFileToDocArr(char *filename, WordTree *wt,
                           Document *documentsArr[], char **rawDocumentsArr[], int *numDocs) {
     FILE *file = fopen(filename, "r");
-    /*
-     * todo what do you think on making physical size greater since we are dealing with huge files
-     * so we dont need to realloc each time?
-     */
     unsigned int logicalSize = 0, physicalSize = 1;
 
     // set memory to both documentArr
