@@ -2,7 +2,7 @@
 
 #define AMOUNT_OF_INPUT_SENTENCES 5
 
-void findUserSearchingQueriesInFile(Document testDoc, WordTree wordTree, Document *trainDocsArr, int trainNumDocs,
+void getMatchingDocumentToUserSearchingQueries(Document testDoc, WordTree wordTree, Document *trainDocsArr, int trainNumDocs,
                                     char **rawDocumentsArr);
 
 void freeMemoryAllocation(WordTree wordTree, Document *trainDocsArr, int trainNumDocs, char **rawDocumentsArr);
@@ -15,48 +15,50 @@ int main() {
     Document testDoc; // represents user search query in a Document object
 
     WordTree wordTree = buildTree(fileName);
-    printf("wordTree successfully built...\n");
+    printf("The Tree of words was built successfully ...\n");
 
     documentFileToDocArr(fileName, &wordTree, &trainDocsArr, &rawDocumentsArr, &trainNumDocs);
-    printf("train file read and processed...\n\n");
+    printf("Train file read and processed...\n\n");
 
-    findUserSearchingQueriesInFile(testDoc, wordTree, trainDocsArr, trainNumDocs, rawDocumentsArr);
+    //todo in Gidon's example the swine flu there was a match in line 366 but our code finds its already in line
+    // 56 I think ours is better. let me know what you think.
+    getMatchingDocumentToUserSearchingQueries(testDoc, wordTree, trainDocsArr, trainNumDocs, rawDocumentsArr);
     freeMemoryAllocation(wordTree, trainDocsArr, trainNumDocs, rawDocumentsArr);
 
 }
 
 /**
- * Method gets search query from user, turns it into a documents and searches over the
- * binary search tree to find te highest match
- * @param testDoc
- * @param wordTree
- * @param trainDocsArr
- * @param trainNumDocs
- * @param rawDocumentsArr
+ * Method gets search query from user, turns it into a document and searches the phrase over the
+ * binary search tree we built earlier to find te greatest match
+ * @param testDoc - The user query after DELIMITERS cleanup represented in a Document format
+ * @param wordTree - Binary search tree of words
+ * @param trainDocsArr - list of all sentences from file represented as Documents.
+ * @param trainNumDocs - number of lines in the given file
+ * @param rawDocumentsArr - list of lines as they appear in the given file ( without any processing )
  */
-void findUserSearchingQueriesInFile(Document testDoc, WordTree wordTree, Document *trainDocsArr, int trainNumDocs,
+void getMatchingDocumentToUserSearchingQueries(Document testDoc, WordTree wordTree, Document *trainDocsArr, int trainNumDocs,
                                     char **rawDocumentsArr) {
     int i = 0;
-    int docIdx;
+    int docIdx; // best matching Document line number from original file.
     char docStr[SIZE];
 
     for (i = 0; i < AMOUNT_OF_INPUT_SENTENCES; i++) {
-        printf("enter sentence %d/%d:", i, AMOUNT_OF_INPUT_SENTENCES);
+        printf("Enter a sentence %d/%d:", i, AMOUNT_OF_INPUT_SENTENCES);
         gets(docStr); // deprecated but Gidon gave permission to use it
         testDoc = processToDoc(docStr, &wordTree);
         printDoc(&testDoc);
         docIdx = docSimTrain(&testDoc, &trainDocsArr, trainNumDocs);
-        printf("best matching train document: %d %s\n", docIdx, rawDocumentsArr[docIdx]);
+        printf("Best matching document: %d %s\n", docIdx, rawDocumentsArr[docIdx]);
     }
 }
 
 /**
  * Free all memory allocation
- * @param wordTree
- * @param trainDocsArr
- * @param trainNumDocs
- * @param testDoc
- * @param rawDocumentsArr
+ * @param wordTree - Binary search tree of words
+ * @param trainDocsArr - list of all sentences from file represented as Documents.
+ * @param trainNumDocs - number of lines in the given file
+ * @param testDoc - The user query after DELIMITERS cleanup represented in a Document format
+ * @param rawDocumentsArr - list of lines as they appear in the given file ( without any processing )
  */
 void freeMemoryAllocation(WordTree wordTree, Document *trainDocsArr, int trainNumDocs, char **rawDocumentsArr) {
     // Free the memory

@@ -5,6 +5,7 @@
 #include <ctype.h>
 
 #define SIZE 150
+// TODO wait for GIdon's answer is can add \n otherwise need to take it out of last word in the findWordId function
 #define DELIMITERS " ,.;:?!-\t'()[]{}<>~_"
 
 
@@ -23,7 +24,6 @@ typedef struct document {
     unsigned int docLength;
     unsigned short *wordIdArr;
 } Document;
-
 
 
 int isWord(char *token);
@@ -57,11 +57,11 @@ void freeTreeRec(TreeNode *root);
 void documentFileToDocArr(char *filename, WordTree *wt,
                           Document **documentsArr, char ***rawDocumentsArr, int *numDocs);
 
-int docSimTrain(Document * testDoc, Document ** trainDocumentsArr, int numDocsTrain);
+int docSimTrain(Document *testDoc, Document **trainDocumentsArr, int numDocsTrain);
 
 float docSimBinary(Document *doc1, Document *doc2);
 
-void freeDocument(Document * document);
+void freeDocument(Document *document);
 
 void freeArrayOfDocuments(Document *documents, int size);
 
@@ -139,7 +139,7 @@ WordTree buildTree(char *fileName) {
  * This method get a word tree, and a word. The method will search for the word in the
  * word tree, and will return it's wordId.
  * Will return -1 if the word is not found.
- * @param wt
+ * @param wt - word tree
  * @param word
  * @return
  */
@@ -232,6 +232,7 @@ void freeTree(WordTree tr) {
     freeTreeRec(tr.root);
 }
 
+// helper function for freeTree
 void freeTreeRec(TreeNode *root) {
     if (root != NULL) {
         freeTreeRec(root->left);
@@ -242,9 +243,9 @@ void freeTreeRec(TreeNode *root) {
 }
 
 /**
- * Comparison function between 2 shorts used with qsort.
- * @param a
- * @param b
+ * Comparison function between 2 shorts, helper for the generic function qsort.
+ * @param a - wordId
+ * @param b - wordId
  * @return
  */
 int compareShorts(const void *a, const void *b) {
@@ -289,7 +290,7 @@ Document processToDoc(char *docStr, WordTree *wt) {
 
     // Since strtok replaces the spaces with \0, we need to copy the
     // string to another place in the memory in order not to corrupt the original docStr
-    strcpy( tempDocStr, docStr );
+    strcpy(tempDocStr, docStr);
 
     // Lowercase the given string
     convertStringToLowercase(tempDocStr);
@@ -328,11 +329,12 @@ Document processToDoc(char *docStr, WordTree *wt) {
 }
 
 /**
- * Prints a Document to the stdout.
+ * Prints a Document metadata to the stdout.
+ * metadata - Documents size and for every word by user its corresponding WordId from the "wordTree"
  * @param doc
  */
 void printDoc(Document *doc) {
-    printf("Document Length:%d word Ids:", doc->docLength);
+    printf("Document Length: %d word Ids: ", doc->docLength);
     for (int i = 0; i < (int) doc->docLength; i++) {
         printf("%d ", doc->wordIdArr[i]);
     }
@@ -345,10 +347,10 @@ void printDoc(Document *doc) {
  * rawDocumentsArr.
  * In addition, it will save the amount of generated documents in numDocs.
  * @param filename
- * @param wt
- * @param documentsArr
- * @param rawDocumentsArr
- * @param numDocs
+ * @param wt - Binary search tree of words and their IDs
+ * @param documentsArr - List of Documents. Each item represents a line in the given text file as Document.
+ * @param rawDocumentsArr - List of sentences ( raw line from file )
+ * @param numDocs - Basically represnts the num of lines in file / created documents.
  */
 void documentFileToDocArr(char *filename, WordTree *wt,
                           Document *documentsArr[], char **rawDocumentsArr[], int *numDocs) {
@@ -360,17 +362,17 @@ void documentFileToDocArr(char *filename, WordTree *wt,
     assert(documentsArr);
 
     //set memory to rawDocumentsArr - the arr of lines from File
-    *rawDocumentsArr = (char* *) malloc(physicalSize * sizeof(char *));
+    *rawDocumentsArr = (char **) malloc(physicalSize * sizeof(char *));
     assert(rawDocumentsArr);
 
     char line[SIZE];
 
     while (fgets(line, SIZE, file)) {
-        char * newLine = (char *) malloc(SIZE);
+        char *newLine = (char *) malloc(SIZE);
 
         // copy doc to array
         (*documentsArr)[logicalSize] = processToDoc(line, wt);
-        memcpy(newLine,line, SIZE);
+        memcpy(newLine, line, SIZE);
 
         // set line in rawDocumentsArr
         (*rawDocumentsArr)[logicalSize] = newLine;
@@ -382,10 +384,11 @@ void documentFileToDocArr(char *filename, WordTree *wt,
             *documentsArr = realloc(*documentsArr, physicalSize * sizeof(Document));
             *rawDocumentsArr = realloc(*rawDocumentsArr, physicalSize * (sizeof(char **)));
         }
-
-        *documentsArr = realloc(*documentsArr, physicalSize * sizeof(Document));
-        *rawDocumentsArr = realloc(*rawDocumentsArr, physicalSize * (sizeof(char **)));
     }
+
+    // shrinkg both arrays to their logical size if needed
+    *documentsArr = realloc(*documentsArr, physicalSize * sizeof(Document));
+    *rawDocumentsArr = realloc(*rawDocumentsArr, physicalSize * (sizeof(char **)));
 
 
     *numDocs = logicalSize;
@@ -396,17 +399,16 @@ void documentFileToDocArr(char *filename, WordTree *wt,
 /**
  * This method get a document and a list of documents, and using docSimBinary
  * method it will find the index of the document which has highest similarity, from the documents array.
- * @param testDoc
- * @param trainDocumentsArr
- * @return
+ * @param testDoc - The user query represented in a Document format
+ * @param trainDocumentsArr - List of all sentences from file represented as Documents.
+ * @return matchIndex - The best matching document line from original file.
  */
-int docSimTrain(Document * testDoc,
-                Document ** trainDocumentsArr,int numDocsTrain) {
+int docSimTrain(Document *testDoc, Document **trainDocumentsArr, int numDocsTrain) {
     int i = 0, matchIndex = 0;
     float maxSimValue = 0, tempSimValue;
 
-    for(i = 0 ; i < numDocsTrain ; i++){
-        tempSimValue = docSimBinary(testDoc, *trainDocumentsArr+i);
+    for (i = 0; i < numDocsTrain; i++) {
+        tempSimValue = docSimBinary(testDoc, *trainDocumentsArr + i);
         if (tempSimValue > maxSimValue) {
             matchIndex = i;
             maxSimValue = tempSimValue;
@@ -418,31 +420,28 @@ int docSimTrain(Document * testDoc,
 
 /**
  * checks match ratio between two documents.
- * @param doc1
- * @param doc2
- * @return
+ * @param doc1 - The user query represented in a Document format - Ids are sorted in an ASC order
+ * @param doc2 - A single line from original file in a Document format. - Ids are sorted in an ASC order
+ * @return counter - Number of matching words between doc1 and doc2.
  */
 float docSimBinary(Document *doc1, Document *doc2) {
     float counter = 0;
-    int indexDoc1 = 0, indexDoc2 = 0;
-    int doc1Size = doc1->docLength, doc2Size = doc2->docLength;
+    unsigned int indexDoc1 = 0, indexDoc2 = 0;
+    unsigned int doc1Size = doc1->docLength, doc2Size = doc2->docLength;
 
-    while (doc1Size && doc2Size) {
-        if (doc1->wordIdArr[indexDoc1] == doc2->wordIdArr[indexDoc2]) {
+    while ((indexDoc1 < doc1Size) && (indexDoc2 < doc2Size)) {
+        unsigned int wordId1 = doc1->wordIdArr[indexDoc1], wordId2 = doc2->wordIdArr[indexDoc2];
+
+        if (wordId1 < wordId2) {
+            indexDoc1++;
+        } else if (wordId1 > wordId2) {
+            indexDoc2++;
+        } else {
             counter++;
             indexDoc1++;
             indexDoc2++;
-            doc1Size--;
-            doc2Size--;
-        } else if (doc1->wordIdArr[indexDoc1] < doc2->wordIdArr[indexDoc2]) {
-            indexDoc1++;
-            doc1Size--;
-        } else {
-            indexDoc2++;
-            doc2Size--;
         }
     }
-
     return counter;
 }
 
@@ -450,7 +449,7 @@ float docSimBinary(Document *doc1, Document *doc2) {
  * Frees document struct from the memory.
  * @param document
  */
-void freeDocument(Document * document) {
+void freeDocument(Document *document) {
     free(document->wordIdArr);
     document->wordIdArr = NULL;
 }
@@ -460,7 +459,7 @@ void freeDocument(Document * document) {
  * @param documents
  */
 void freeArrayOfDocuments(Document *documents, int size) {
-    for (int i = 0; i < size; i ++) {
+    for (int i = 0; i < size; i++) {
         freeDocument(documents + i);
     }
     free(documents);
@@ -473,7 +472,7 @@ void freeArrayOfDocuments(Document *documents, int size) {
  * @return
  */
 void freeArrayOfCharArrays(char **arr, int size) {
-    for (int i = 0; i < size; i ++) {
+    for (int i = 0; i < size; i++) {
         free(arr[i]);
     }
     free(arr);
