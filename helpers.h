@@ -337,7 +337,7 @@ Document processToDoc(char *docStr, WordTree *wt) {
  * @param doc
  */
 void printDoc(Document *doc) {
-    printf("Document Length: %d word Ids: ", doc->docLength);
+    printf("docLength:%d wordIds: ", doc->docLength);
     for (int i = 0; i < (int) doc->docLength; i++) {
         printf("%d ", doc->wordIdArr[i]);
     }
