@@ -5,7 +5,6 @@
 #include <ctype.h>
 
 #define SIZE 150
-// TODO wait for GIdon's answer is can add \n otherwise need to take it out of last word in the findWordId function
 #define DELIMITERS " ,.;:?!-\t'()[]{}<>~_"
 
 
@@ -77,16 +76,18 @@ void convertStringToLowercase(char *str);
  * @return
  */
 int isWord(char *token) {
-    int i;
-    for (i = 0; i < strlen(token); i++) {
+    if(token){
+        int i;
+        for (i = 0; i < strlen(token); i++) {
 
-        // check if char ASCII is outside the ABCabc boundaries
-        if (token[i] < 'A' || token[i] > 'z') {
-            return 0;
+            // check if char ASCII is outside the ABCabc boundaries
+            if (token[i] < 'A' || token[i] > 'z') {
+                return 0;
+            }
         }
+        return 1;
     }
-
-    return 1;
+    return 0; // no valid token
 }
 
 /**
@@ -127,6 +128,7 @@ WordTree buildTree(char *fileName) {
 
     // Read every line, and process it
     while (fgets(line, SIZE, file)) {
+        strtok(line, "\n"); // remove \n from end of line before processing
         processLine(line, &wordTree);
     }
 
@@ -298,8 +300,9 @@ Document processToDoc(char *docStr, WordTree *wt) {
     word = strtok(tempDocStr, DELIMITERS);
 
     while (word != NULL) {
+
         // Get word ID for current word
-        currentWordId = findWordId(wt, word);
+        currentWordId = isWord(word) ? findWordId(wt, word) : -1;
 
         if (currentWordId != -1) {
             // Check if the word ID already exists in the list
@@ -368,6 +371,7 @@ void documentFileToDocArr(char *filename, WordTree *wt,
     char line[SIZE];
 
     while (fgets(line, SIZE, file)) {
+        strtok(line,"\n"); // remove \n from line
         char *newLine = (char *) malloc(SIZE);
 
         // copy doc to array

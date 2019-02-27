@@ -20,8 +20,6 @@ int main() {
     documentFileToDocArr(fileName, &wordTree, &trainDocsArr, &rawDocumentsArr, &trainNumDocs);
     printf("Train file read and processed...\n\n");
 
-    //todo in Gidon's example the swine flu there was a match in line 366 but our code finds its already in line
-    // 56 I think ours is better. let me know what you think.
     getMatchingDocumentToUserSearchingQueries(testDoc, wordTree, trainDocsArr, trainNumDocs, rawDocumentsArr);
     freeMemoryAllocation(wordTree, trainDocsArr, trainNumDocs, rawDocumentsArr);
 
