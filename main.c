@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "helpers.h"
 
 #define AMOUNT_OF_INPUT_SENTENCES 5
