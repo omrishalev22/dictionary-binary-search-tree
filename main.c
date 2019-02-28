@@ -41,10 +41,9 @@ void getMatchingDocumentToUserSearchingQueries(Document testDoc, WordTree wordTr
     char docStr[SIZE];
 
     for (i = 0; i < AMOUNT_OF_INPUT_SENTENCES; i++) {
-        printf("Enter a sentence %d/%d:", i, AMOUNT_OF_INPUT_SENTENCES);
+        printf("Enter a sentence %d/%d:", i+1, AMOUNT_OF_INPUT_SENTENCES);
         gets(docStr); // deprecated but Gidon gave permission to use it
         testDoc = processToDoc(docStr, &wordTree);
-        printDoc(&testDoc);
         docIdx = docSimTrain(&testDoc, &trainDocsArr, trainNumDocs);
         printf("Best matching document: %d %s\n", docIdx, rawDocumentsArr[docIdx]);
     }
