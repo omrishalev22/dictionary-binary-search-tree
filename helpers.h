@@ -1,3 +1,6 @@
+#ifndef __H_H
+#define __H_H
+
 #define SIZE 150
 #define DELIMITERS " ,.;:?!-\t'()[]{}<>~_"
 
@@ -60,3 +63,5 @@ void freeArrayOfDocuments(Document *documents, int size);
 void freeArrayOfCharArrays(char **arr, int size);
 
 void convertStringToLowercase(char *str);
+
+#endif
